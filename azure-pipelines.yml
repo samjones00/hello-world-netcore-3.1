@@ -16,9 +16,8 @@ variables:
   
 stages:
 - stage: A
-  pool: StageAPool
   jobs:
-  - job: A1 # will run on "StageAPool" pool based on the pool defined on the stage
+  - job: Build and Test
     steps:
     - task: NuGetToolInstaller@1
 
@@ -39,8 +38,7 @@ stages:
         configuration: '$(buildConfiguration)'
 
 
-  - job: A2 # will run on "JobPool" pool
-    pool: JobPool
+  - job: Deploy to Test environment
     steps:
     - task: DotNetCoreCLI@2
       inputs:
