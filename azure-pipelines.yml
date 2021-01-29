@@ -13,36 +13,45 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  
+stages:
+- stage: A
+  pool: StageAPool
+  jobs:
+  - job: A1 # will run on "StageAPool" pool based on the pool defined on the stage
+    steps:
+    - task: NuGetToolInstaller@1
 
-steps:
-- task: NuGetToolInstaller@1
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(solution)'
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
+    - task: VSBuild@1
+      inputs:
+        solution: '$(solution)'
+        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    - task: VSTest@2
+      inputs:
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'pack'
-    packagesToPack: '**/*.csproj'
-    versioningScheme: 'off'
+  - job: A2 # will run on "JobPool" pool
+    pool: JobPool
+    steps:
+    - task: DotNetCoreCLI@2
+      inputs:
+          command: 'pack'
+          packagesToPack: '**/*.csproj'
+          versioningScheme: 'off'
 
-- task: AzureRmWebAppDeployment@4
-  inputs:
-    ConnectionType: 'AzureRM'
-    azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
-    appType: 'webApp'
-    WebAppName: 'contoso-crafts-sjo'
-    packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+          ConnectionType: 'AzureRM'
+          azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
+          appType: 'webApp'
+          WebAppName: 'contoso-crafts-sjo'
+          packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
