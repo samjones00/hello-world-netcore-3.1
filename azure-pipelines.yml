@@ -37,9 +37,6 @@ stages:
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
 
-
-  - job: Deploy # will deploy to test environment
-    steps:
     - task: DotNetCoreCLI@2
       inputs:
           command: 'pack'
@@ -52,4 +49,4 @@ stages:
           azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
           appType: 'webApp'
           WebAppName: 'contoso-crafts-sjo'
-          packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+          packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
