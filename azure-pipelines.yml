@@ -6,6 +6,7 @@
 trigger:
 - main
 
+
 pool:
   vmImage: 'windows-latest'
 
@@ -20,7 +21,6 @@ stages:
   - job: Build # Build & Test
     steps:
     - task: NuGetToolInstaller@1
-
     - task: NuGetCommand@2
       inputs:
         restoreSolution: '$(solution)'
@@ -37,11 +37,11 @@ stages:
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
 
-    - task: DotNetCoreCLI@2
-      inputs:
-          command: 'pack'
-          packagesToPack: '**/*.csproj'
-          versioningScheme: 'off'
+    ##- task: DotNetCoreCLI@2
+    ##  inputs:
+    ##      command: 'pack'
+    ##      packagesToPack: '**/*.csproj'
+    ##      versioningScheme: 'off'
     - task: AzureRmWebAppDeployment@4
       displayName: Deploy to slot A
       inputs:
