@@ -18,6 +18,8 @@ variables:
 stages:
 - stage: A
   jobs:
+  - deployment: DeployWeb
+  - environment: dasd
   - job: Build # Build & Test
     steps:
     - task: NuGetToolInstaller@1
