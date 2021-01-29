@@ -17,6 +17,8 @@ variables:
 stages:
 - stage: deploy
   jobs:
+
+  
   - deployment: DeployWeb
     displayName: deploy Web App
     pool:
@@ -28,71 +30,38 @@ stages:
         deploy:
           steps:
           - script: echo Hello world
+          - task: NuGetToolInstaller@1
+          - task: NuGetCommand@2
+            inputs:
+              restoreSolution: '$(solution)'
 
-- stage: A
-  jobs:
-  - deployment: DeployWeb
-    environment: Slot A
-  - job: Build # Build & Test
-    steps:
-    - task: NuGetToolInstaller@1
-    - task: NuGetCommand@2
-      inputs:
-        restoreSolution: '$(solution)'
+          - task: VSBuild@1
+            inputs:
+              solution: '$(solution)'
+              msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+              platform: '$(buildPlatform)'
+              configuration: '$(buildConfiguration)'
 
-    - task: VSBuild@1
-      inputs:
-        solution: '$(solution)'
-        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
+          - task: VSTest@2
+            inputs:
+              platform: '$(buildPlatform)'
+              configuration: '$(buildConfiguration)'
 
-    - task: VSTest@2
-      inputs:
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
+          - task: AzureRmWebAppDeployment@4
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
+              appType: 'webApp'
+              WebAppName: 'contoso-crafts-sjo'
+              deployToSlotOrASE: true
+              ResourceGroupName: 'contoso-crafts'
+              SlotName: 'SlotA'
+              packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
 
-    #- task: DotNetCoreCLI@2
-    #  inputs:
-        #      command: 'pack'
-    #      packagesToPack: '**/*.csproj'
-    #      versioningScheme: 'off'
-    - task: AzureRmWebAppDeployment@4
-      displayName: Deploy to slot A
-      inputs:
-        ConnectionType: 'AzureRM'
-        azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
-        appType: 'webApp'
-        WebAppName: 'contoso-crafts-sjo'
-        deployToSlotOrASE: true
-        ResourceGroupName: 'contoso-crafts'
-        SlotName: 'SlotA'
-        packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
-
-    - task: AzureAppServiceManage@0
-      inputs:
-        azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
-        Action: 'Swap Slots'
-        WebAppName: 'contoso-crafts-sjo'
-        ResourceGroupName: 'contoso-crafts'
-        SourceSlot: 'SlotA'
-
-    - task: AzureRmWebAppDeployment@4
-      displayName: Deploy to slot B
-      inputs:
-        ConnectionType: 'AzureRM'
-        azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
-        appType: 'webApp'
-        WebAppName: 'contoso-crafts-sjo'
-        deployToSlotOrASE: true
-        ResourceGroupName: 'contoso-crafts'
-        SlotName: 'SlotA'
-        packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
-
-    - task: AzureAppServiceManage@0
-      inputs:
-        azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
-        Action: 'Swap Slots'
-        WebAppName: 'contoso-crafts-sjo'
-        ResourceGroupName: 'contoso-crafts'
-        SourceSlot: 'SlotB'
+          - task: AzureAppServiceManage@0
+            inputs:
+              azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
+              Action: 'Swap Slots'
+              WebAppName: 'contoso-crafts-sjo'
+              ResourceGroupName: 'contoso-crafts'
+              SourceSlot: 'SlotA'
