@@ -19,7 +19,7 @@ stages:
 - stage: A
   jobs:
   - deployment: DeployWeb
-  - environment: dasd
+    environment: Slot A
   - job: Build # Build & Test
     steps:
     - task: NuGetToolInstaller@1
