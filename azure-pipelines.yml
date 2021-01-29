@@ -53,3 +53,31 @@ stages:
         ResourceGroupName: 'contoso-crafts'
         SlotName: 'SlotA'
         packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
+
+    - task: AzureAppServiceManage@0
+      inputs:
+        azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
+        Action: 'Swap Slots'
+        WebAppName: 'contoso-crafts-sjo'
+        ResourceGroupName: 'contoso-crafts'
+        SourceSlot: 'SlotA'
+
+    - task: AzureRmWebAppDeployment@4
+      displayName: Deploy to slot B
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
+        appType: 'webApp'
+        WebAppName: 'contoso-crafts-sjo'
+        deployToSlotOrASE: true
+        ResourceGroupName: 'contoso-crafts'
+        SlotName: 'SlotA'
+        packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
+
+    - task: AzureAppServiceManage@0
+      inputs:
+        azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
+        Action: 'Swap Slots'
+        WebAppName: 'contoso-crafts-sjo'
+        ResourceGroupName: 'contoso-crafts'
+        SourceSlot: 'SlotB'
