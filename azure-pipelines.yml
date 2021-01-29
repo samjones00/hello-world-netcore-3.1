@@ -17,7 +17,7 @@ variables:
 stages:
 - stage: A
   jobs:
-  - job: Build and Test
+  - job: Build # Build & Test
     steps:
     - task: NuGetToolInstaller@1
 
@@ -38,7 +38,7 @@ stages:
         configuration: '$(buildConfiguration)'
 
 
-  - job: Deploy to Test environment
+  - job: Deploy # will deploy to test environment
     steps:
     - task: DotNetCoreCLI@2
       inputs:
