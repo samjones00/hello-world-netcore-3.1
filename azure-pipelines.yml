@@ -18,6 +18,7 @@ stages:
 - stage: Build
   jobs:
   - deployment: DeployWeb
+    environment: Slot A
     displayName: deploy Web App
     pool:
       vmImage: 'Ubuntu-latest'
