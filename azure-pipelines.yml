@@ -43,7 +43,8 @@ stages:
               platform: '$(buildPlatform)'
               configuration: '$(buildConfiguration)'
 
-- stage: Deploy to slot A
+- stage: Slot A
+  displayName: Deploy to slot A
   jobs:
   - deployment: DeployWeb
     environment: Slot A
@@ -71,7 +72,8 @@ stages:
         ResourceGroupName: 'contoso-crafts'
         SourceSlot: 'SlotA'
 
-- stage: Deploy to slot B
+- stage: Slot B
+  displayName: Deploy to slot B
   jobs:
   - deployment: DeployWeb
     environment: Slot B
