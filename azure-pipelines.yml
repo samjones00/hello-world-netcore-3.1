@@ -88,7 +88,7 @@ stages:
         WebAppName: 'contoso-crafts-sjo'
         deployToSlotOrASE: true
         ResourceGroupName: 'contoso-crafts'
-        SlotName: 'SlotA'
+        SlotName: 'SlotB'
         packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
 
     - task: AzureAppServiceManage@0
