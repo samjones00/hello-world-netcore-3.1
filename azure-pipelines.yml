@@ -42,11 +42,14 @@ stages:
           command: 'pack'
           packagesToPack: '**/*.csproj'
           versioningScheme: 'off'
-
     - task: AzureRmWebAppDeployment@4
+      displayName: Deploy to slot A
       inputs:
-          ConnectionType: 'AzureRM'
-          azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
-          appType: 'webApp'
-          WebAppName: 'contoso-crafts-sjo'
-          packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'Pay-As-You-Go Dev/Test(1ad2775d-4cce-4170-a27e-814087092b90)'
+        appType: 'webApp'
+        WebAppName: 'contoso-crafts-sjo'
+        deployToSlotOrASE: true
+        ResourceGroupName: 'contoso-crafts'
+        SlotName: 'SlotA'
+        packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
